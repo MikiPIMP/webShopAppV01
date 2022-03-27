@@ -2,11 +2,6 @@
 ### Probna verzija web aplikacije za Hakaton 2022.
 
 
-
 /----------------------------------------------------------------------------------------/
-dunja: testttt
-Ognjen: Test :)  
-Ilija: test
-Milan: Ovo je nov repozitorijum. Prosli sam pokvario :)    (18.03.2022. u 09:35h) (prvi komentar)  
-     : Ovde cu vam postavljati taskove i komentare.  
-     : Nek svako iznad ovog mog komentara, u README.md fajlu (tj. ovde), postavi svoj Test-komentar.  
+Milan: Taskovi: 1) Svi klonirajte repozitorijum lokalno.           (27.03.2022. u 14:05h)
+              : 2) Napravite bazu sa SQL kodom, koji je u .DATABASE folderu.
