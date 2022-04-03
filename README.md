@@ -6,6 +6,7 @@
         2) Ognjen Božić,
         3) Dunja Božinović,
         4) Milan Minić
+        5) Stefan Radivojević
  
 - #### Početak izrade projekta: 15.03.2022.
 - #### Web Aplikacija je u izradi!
