@@ -102,7 +102,10 @@ REFERENCES TipKorisnik(tip_korisnik_id);
 
 
 
-/*Provera postojanja korisnika*/
+
+
+
+/*-------------------------------------- Tabela KORISNIK -------------------------------------------*/
 GO
 Create PROC dbo.Korisnik_Email
 @email nvarchar(50),
@@ -154,33 +157,57 @@ END CATCH
 GO
 
 
-
-/*  OVO JE VEC GORE NAPRAVLJENO, Da li je greskom ponovljeno ??
 GO
-Create PROC dbo.Korisnik_Email
-@email nvarchar(50),
-@loz nvarchar(100)
+Create PROC Korisnik_Update
+@korisnik_id int,
+@ime_korisnik nvarchar(100),
+@prezime_korisnik nvarchar(100),
+@lozinka_hash nvarchar(255),
+@email nvarchar(255),
+@drzava nvarchar(100),
+@grad nvarchar(100),
+@opstina nvarchar(100),
+@postanski_br int,
+@adresa nvarchar(255),
+@tip_korisnik_id int,
+@pol nvarchar(10)
 AS
 SET LOCK_TIMEOUT 3000;
+
 BEGIN TRY
-	IF EXISTS(SELECT TOP 1 email FROM Korisnik
-	WHERE email = @email and lozinka_hash=@loz)
-	Begin
-	RETURN 0
-	end
-	RETURN 1
+	IF EXISTS (SELECT TOP 1 ime_korisnik FROM Korisnik
+	WHERE korisnik_id = @korisnik_id)
+
+	BEGIN
+	
+	Update Korisnik Set ime_korisnik=@ime_korisnik, prezime_korisnik=@prezime_korisnik, lozinka_hash=@lozinka_hash, email=@email, @drzava=@drzava, grad=@grad, opstina=@opstina, postanski_br=@postanski_br, adresa=@adresa, tip_korisnik_id=@tip_korisnik_id, pol=@pol where korisnik_id = @korisnik_id
+		RETURN 0;
+	END
+	RETURN -1;
 END TRY
 BEGIN CATCH
-	RETURN @@error;
+	RETURN @@ERROR;
 END CATCH
 GO
-*/
+
+Go
+Create Proc Korisnik_Delete
+@korisnik_id int
+as
+Begin TRY
+Delete from Korisnik where korisnik_id = @korisnik_id
+RETURN 0
+END TRY
+BEGIN CATCH
+	RETURN @@ERROR;
+END CATCH
+GO
 
 
 
-/*-------------------------------------- Radio sam odavde -------------------------------------------*/
-/* Nisam pokretao u SSMS-u */
-/* Provera broja u magacinu >>> tabela Artikal*/
+
+/*-------------------------------------- Tabela Artikal -------------------------------------------*/
+
 GO
 Create PROC dbo.Artikal_Magacin
 @ime nvarchar(100),
@@ -227,6 +254,49 @@ END CATCH
 GO
 
 
+GO
+Create PROC Arikal_Update
+@artikal_id int,
+@ime nvarchar(100),
+@cena int,
+@statusArtikla_id int,
+@kategorija_id int,
+@slika_id int,
+@opis nvarchar(250),
+@magacin int
+AS
+SET LOCK_TIMEOUT 3000;
+
+BEGIN TRY
+	IF EXISTS (SELECT TOP 1 ime FROM Artikal
+	WHERE artikal_id = @artikal_id )
+
+	BEGIN
+	
+	Update Artikal Set ime=@ime, cena=@cena, statusArtikla_id=@statusArtikla_id, kategorija_id=@kategorija_id, slika_id=@slika_id, opis=@opis, magacin=@magacin where artikal_id=@artikal_id
+		RETURN 0;
+	END
+	RETURN -1;
+END TRY
+BEGIN CATCH
+	RETURN @@ERROR;
+END CATCH
+GO
+
+go
+Create Proc Artikal_Delete
+@artikal_id int,
+@ime nvarchar(100)
+as
+Begin TRY
+Delete from Artikal where ime=@ime and artikal_id=@artikal_id
+RETURN 0
+END TRY
+BEGIN CATCH
+	RETURN @@ERROR;
+END CATCH
+GO
+
 
 /* ----------------------Tabela Kategorija -------------------- */
 GO
@@ -268,17 +338,52 @@ BEGIN CATCH
 END CATCH
 GO
 
+GO
+Create PROC Kategorija_Update
+@kategorija_id int,
+@kategorija_ime nvarchar(100)
+AS
+SET LOCK_TIMEOUT 3000;
+
+BEGIN TRY
+	IF EXISTS (SELECT TOP 1 kategorija_ime FROM Kategorija
+	WHERE kategorija_id = @kategorija_id)
+	BEGIN
+	Update Kategorija Set kategorija_ime = @kategorija_ime where kategorija_id = @kategorija_id
+		RETURN 0;
+	END
+	RETURN -1;
+END TRY
+
+BEGIN CATCH
+	RETURN @@ERROR;
+END CATCH
+GO
+
+Go
+Create Proc Kategorija_Delete
+@kategorija_id int,
+@kategorija_ime nvarchar(100)
+as
+Begin TRY
+Delete from Kategorija where kategorija_ime = @kategorija_ime and kategorija_id = @kategorija_id
+RETURN 0
+END TRY
+BEGIN CATCH
+	RETURN @@ERROR;
+END CATCH
+GO
 
 
 
-/* ----------------------Tabela StatusArtikla, Da li i za ovu tabelu pravimo proceduru? -------------------- */
+/* ---------------------- Tabela StatusArtikla -------------------- */
 GO
 Create PROC dbo.StatusArtikla_Status
 @is_vidljivo BIT
 AS
 SET LOCK_TIMEOUT 3000;
 BEGIN TRY
-	IF EXISTS(SELECT TOP 1 is_vidljivo FROM StatusArtikla                      /*Ovde kao da fali neka dodatna funkcija..*/
+	IF EXISTS(SELECT TOP 1 is_vidljivo FROM StatusArtikla
 	WHERE is_vidljivo = @is_vidljivo)
 	Begin
 	RETURN 0
@@ -311,6 +416,41 @@ BEGIN CATCH
 END CATCH
 GO
 
+GO
+Create PROC StatusArtikla_Update
+@statusArtikla_id int,
+@is_vidljivo BIT
+AS
+SET LOCK_TIMEOUT 3000;
+
+BEGIN TRY
+	IF EXISTS (SELECT TOP 1 is_vidljivo FROM StatusArtikla
+	WHERE statusArtikla_id = @statusArtikla_id )
+
+	BEGIN
+	
+	Update StatusArtikla Set is_vidljivo = @is_vidljivo where statusArtikla_id = @statusArtikla_id
+		RETURN 0;
+	END
+	RETURN -1;
+END TRY
+BEGIN CATCH
+	RETURN @@ERROR;
+END CATCH
+GO
+
+Go
+Create Proc StatusArtikla_Delete
+@statusArtikla_id int
+as
+Begin TRY
+Delete from StatusArtikla where statusArtikla_id = @statusArtikla_id
+RETURN 0
+END TRY
+BEGIN CATCH
+	RETURN @@ERROR;
+END CATCH
+GO
 
 
 /* ---------------------- Tabela Slika ---------------------- */
@@ -353,6 +493,41 @@ BEGIN CATCH
 END CATCH
 GO
 
+GO
+Create PROC Slika_Update
+@slika_id int,
+@slika_ref nvarchar(150)
+AS
+SET LOCK_TIMEOUT 3000;
+
+BEGIN TRY
+	IF EXISTS (SELECT TOP 1 slika_ref FROM Slika
+	WHERE slika_id = @slika_id )
+
+	BEGIN
+	
+	Update Slika Set slika_ref = @slika_ref where slika_id = @slika_id
+		RETURN 0;
+	END
+	RETURN -1;
+END TRY
+BEGIN CATCH
+	RETURN @@ERROR;
+END CATCH
+GO
+
+Go
+Create Proc Slika_Delete
+@slika_id int
+as
+Begin TRY
+Delete from Slika where slika_id = @slika_id
+RETURN 0
+END TRY
+BEGIN CATCH
+	RETURN @@ERROR;
+END CATCH
+GO
 
 
 /* ---------------------- Tabela Porudzbina ---------------------- */
@@ -400,6 +575,45 @@ BEGIN CATCH
 END CATCH
 GO
 
+GO
+Create PROC Porudzbina_Update
+@porudzbina_id INT,
+@korisnik_id INT,
+@artikal_id INT,
+@is_zavrseno BIT,
+@vreme_porudzbina DATETIME,
+@kolicina_kupovine INT
+AS
+SET LOCK_TIMEOUT 3000;
+
+BEGIN TRY
+	IF EXISTS (SELECT TOP 1 korisnik_id FROM Porudzbina
+	WHERE porudzbina_id = @porudzbina_id )
+
+	BEGIN
+	
+	Update Porudzbina Set korisnik_id=@korisnik_id, artikal_id=@artikal_id, is_zavrseno=@is_zavrseno, vreme_porudzbina=@vreme_porudzbina, kolicina_kupovine=@kolicina_kupovine where porudzbina_id = @porudzbina_id
+		RETURN 0;
+	END
+	RETURN -1;
+END TRY
+BEGIN CATCH
+	RETURN @@ERROR;
+END CATCH
+GO
+
+go
+Create Proc Porudzbina_Delete
+@porudzbina_id INT
+as
+Begin TRY
+Delete from Porudzbina where porudzbina_id = @porudzbina_id
+RETURN 0
+END TRY
+BEGIN CATCH
+	RETURN @@ERROR;
+END CATCH
+GO
 
 
 /* ---------------------- Tabela TipKorisnik ---------------------- */
@@ -442,5 +656,39 @@ BEGIN CATCH
 END CATCH
 GO
 
-/*------kraj-----------*/
 
+GO
+Create PROC TipKorisnik_Update
+@tip_korisnik_id int,
+@is_administrator BIT 
+AS
+SET LOCK_TIMEOUT 3000;
+
+BEGIN TRY
+	IF EXISTS (SELECT TOP 1 is_administrator FROM TipKorisnik
+	WHERE tip_korisnik_id = @tip_korisnik_id )
+
+	BEGIN
+	
+	Update TipKorisnik Set is_administrator = @is_administrator where tip_korisnik_id = @tip_korisnik_id
+		RETURN 0;
+	END
+	RETURN -1;
+END TRY
+BEGIN CATCH
+	RETURN @@ERROR;
+END CATCH
+GO
+
+go
+Create Proc TipKorisnik_Delete
+@tip_korisnik_id int
+as
+Begin TRY
+Delete from TipKorisnik where tip_korisnik_id = @tip_korisnik_id
+RETURN 0
+END TRY
+BEGIN CATCH
+	RETURN @@ERROR;
+END CATCH
+GO
